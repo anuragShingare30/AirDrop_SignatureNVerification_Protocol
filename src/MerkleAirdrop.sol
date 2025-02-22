@@ -6,6 +6,16 @@ import {IERC20,SafeERC20 } from "lib/openzeppelin-contracts/contracts/token/ERC2
 import {MerkleProof} from "lib/openzeppelin-contracts/contracts/utils/cryptography/MerkleProof.sol";
 
 
+/**
+    @title MerkleAirdrop contract
+    @author anurag shingare
+    
+    @notice To generate merkle trees,proofs and root:
+        a. Run GenerateInput.s.sol -> to generate the input file for accounts and amount
+        b. Then run MakeMerkle.s.sol -> to generate leaf node hashes, root hash and sibling node hash!!!
+ */
+
+
 contract MerkleAirdrop {
     using SafeERC20 for IERC20;
 
@@ -42,7 +52,7 @@ contract MerkleAirdrop {
 
         // hash of account and amount -> leaf node
         // Here, we are hashing twice to avoid hash collision
-        // Checking for presence of data in tree 
+        // Here we will check for the data presence in our tree!!! 
         bytes32 leaf = keccak256(bytes.concat(keccak256(abi.encode(account,amount))));
         if(!MerkleProof.verify(merkleProof, i_merkleRoot, leaf)){ // 1.
             revert MerkleAirdrop_InvalidProof();
