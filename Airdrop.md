@@ -64,3 +64,24 @@
 
 
 *A smart contract can store only the Merkle root on-chain, saving more gas than storing every address on an airdrop. The Merkle tree generates a Merkle proof, which can be verified to prove eligibility. This proof authenticates a specific wallet address included in the list of eligible wallets by comparing it to the Merkle root.*
+
+
+
+### Signatures and Verification
+
+
+
+
+
+
+### Souces
+
+1. **Merkle trees and Proofs**:
+    - https://medium.com/@swastika0015/merkle-proofs-explained-208a72971a50
+
+2. **EIP-712 and EIP-191**:
+    - https://www.cyfrin.io/blog/understanding-ethereum-signature-standards-eip-191-eip-712
+
+3. **ECDSA signature algorithm**:
+    - https://fitsaleem.medium.com/ethereums-elliptic-curve-digital-signature-algorithm-ecdsa-88e1659f4879
+    - https://www.cyfrin.io/blog/elliptic-curve-digital-signature-algorithm-and-signatures

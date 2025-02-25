@@ -31,7 +31,7 @@ contract MerkleAirdropTest is Test,ZkSyncChainChecker{
             token.mint(token.owner(), AMOUNT_TO_MINT);
             token.transfer(address(merkleAirdrop),AMOUNT_TO_MINT);
         }
-        
+
 
         (user,userPrivateKey) = makeAddrAndKey("user");
     }
