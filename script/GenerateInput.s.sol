@@ -18,9 +18,9 @@ contract GenerateInput is Script {
         types[0] = "address";
         types[1] = "uint";
         account[0] = "0x6CA6d1e2D5347Bfab1d91e883F1915560e09129D";
-        account[1] = "0x5377CC01A598CBf84F6ffa9007Bdfb33cB741273";
-        account[2] = "0xECe6dcc60bBDfE74a67CB26b1B83af791Aa22AE6";
-        account[3] = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
+        account[1] = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
+        account[2] = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8";
+        account[3] = "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC";
         count = account.length;
         // _createJSON() function will create the input.json file which will contains all addresses and amount as claimers!!!
         string memory input = _createJSON();

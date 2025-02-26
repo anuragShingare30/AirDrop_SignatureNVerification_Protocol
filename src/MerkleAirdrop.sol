@@ -92,7 +92,9 @@ contract MerkleAirdrop is EIP712 {
         return (actualSigner == signer);
     }
 
-    // can be recall as <domainSeparator> 
+    // EIP-712 format :-
+    // 0x19 0x01 <hashStruct(domain separator)> <hashStruct(message)>
+    // can be recall as hash struct of domain separator
     function getMessageHash(address account,uint256 amount) public pure returns(bytes32) {
         return (
             keccak256(

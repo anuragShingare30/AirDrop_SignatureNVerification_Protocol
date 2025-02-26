@@ -83,5 +83,5 @@
     - https://www.cyfrin.io/blog/understanding-ethereum-signature-standards-eip-191-eip-712
 
 3. **ECDSA signature algorithm**:
-    - https://fitsaleem.medium.com/ethereums-elliptic-curve-digital-signature-algorithm-ecdsa-88e1659f4879
     - https://www.cyfrin.io/blog/elliptic-curve-digital-signature-algorithm-and-signatures
+    - https://fitsaleem.medium.com/ethereums-elliptic-curve-digital-signature-algorithm-ecdsa-88e1659f4879

@@ -8,7 +8,7 @@ import {IERC20 } from "lib/openzeppelin-contracts/contracts/interfaces/IERC20.so
 
 contract DeployTokenAndAirdropContract is Script{
 
-    bytes32 public merkleRoot = 0xab33a8088ce135ce1d06a3f89567941e5d8d12fac70322b9c27a5f96ce546fa6;
+    bytes32 public merkleRoot = 0x74ddccb6e201771dc8ddcc9759f73a3bb6851b67f57500b2f7fc2323c03344ba;
     uint256 AMOUNT_TO_CLAIM = 25 * 1e18;
     uint256 AMOUNT_TO_MINT = 4 * (AMOUNT_TO_CLAIM); 
 

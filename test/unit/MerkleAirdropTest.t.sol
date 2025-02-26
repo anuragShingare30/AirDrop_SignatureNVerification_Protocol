@@ -12,12 +12,13 @@ contract MerkleAirdropTest is Test,ZkSyncChainChecker{
     Token public token;
     MerkleAirdrop public merkleAirdrop;
 
-    bytes32 proofOne = 0xe69d442873e63995f17631f1a33e7109f709581ec3a6ee8b5d4f82efac1fbbec;
-    bytes32 proofTwo = 0x057f7ddc2e145c80e02849d93e3faad5d8b4208372dee65c212e88f57fe0b62d; 
+    bytes32 proofOne = 0x0fd7c981d39bece61f7499702bf59b3114a90e66b51ba2c53abdf7b62986c00a;
+    bytes32 proofTwo = 0x71cc24e40153cd652202ed2d5f1da66f139637de876a4de32f1de1caa0dc8d34; 
     bytes32[] public MERKLE_PROOF = [proofOne,proofTwo];
-    bytes32 public merkleRoot = 0xab33a8088ce135ce1d06a3f89567941e5d8d12fac70322b9c27a5f96ce546fa6;
+    bytes32 public merkleRoot = 0x74ddccb6e201771dc8ddcc9759f73a3bb6851b67f57500b2f7fc2323c03344ba;
     address user;
     uint256 userPrivateKey;
+    address gasPayer;
     uint256 AMOUNT = 25 * 1e18; // 25.000000
     uint256 AMOUNT_TO_MINT = AMOUNT * 4;
 
@@ -32,23 +33,31 @@ contract MerkleAirdropTest is Test,ZkSyncChainChecker{
             token.transfer(address(merkleAirdrop),AMOUNT_TO_MINT);
         }
 
-
         (user,userPrivateKey) = makeAddrAndKey("user");
+        gasPayer = makeAddr("gasPayer");
+    }
+
+    function getSigComponent(uint256 privateKey,address account,uint256 amount) public view returns(uint8 v, bytes32 r, bytes32 s){
+        bytes32 digest = merkleAirdrop.getMessageHash(account, amount);
+        (v,r,s) = vm.sign(privateKey, digest);
     }
 
     function test_CheckUserCanClaim() public {
         uint256 userInitialBalance = token.balanceOf(user);
         console.log(userInitialBalance);
 
-        vm.prank(user);
-        merkleAirdrop.claim(user, AMOUNT,MERKLE_PROOF);
+        // get the signature
+        vm.startPrank(user);
+        (uint8 v, bytes32 r, bytes32 s) = getSigComponent(userPrivateKey, user, AMOUNT);
+        vm.stopPrank();
+
+        vm.prank(gasPayer);
+        merkleAirdrop.claim(user, AMOUNT,MERKLE_PROOF,v,r,s);
 
         uint256 userEndingBalance = token.balanceOf(user);
         console.log(userEndingBalance);
-        
+        assert(userEndingBalance == AMOUNT + userInitialBalance);
     }
 
-    function test_RevertsIf_UserIsNotClaimer() public {
-        
-    }
+    
 }
