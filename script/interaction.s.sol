@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import {Script} from "lib/forge-std/Script.sol";
+import {Script} from "lib/forge-std/src/Script.sol";
 import {DevOpsTools} from "lib/foundry-devops/src/DevOpsTools.sol";
 import {MerkleAirdrop} from "src/MerkleAirdrop.sol";
 
@@ -17,7 +17,7 @@ contract ClaimingAirdrop is Script {
 
     function claimAirdrop(address contractAddress) public {
         vm.startBroadcast();
-        MerkleAirdrop(contractAddress).claim(account, amount, merkleProof, _v, _r, _s);
+        // MerkleAirdrop(contractAddress).claim(CLAIMING_ACCOUNT, CLAIMING_AMOUNT, merkleProof, _v, _r, _s);
         vm.stopBroadcast();
     }
 

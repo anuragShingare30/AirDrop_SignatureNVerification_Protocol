@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import {Test,console,Vm} from "lib/forge-std/src/Test.sol";
+import {Test,Vm} from "lib/forge-std/src/Test.sol";
+import {console} from "lib/forge-std/src/console.sol";
 import {Token} from "src/Token.sol";
 import {MerkleAirdrop} from "src/MerkleAirdrop.sol";
 import {IERC20 } from "lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -37,6 +38,14 @@ contract MerkleAirdropTest is Test,ZkSyncChainChecker{
         gasPayer = makeAddr("gasPayer");
     }
 
+    /**
+        @notice getSignatureComponents function
+        @param privateKey users EOA private key
+        @param account user account
+        @param amount the amount of token to be claimed
+        @notice This function will be called by the user/claimer to generate the signature components which can be used for verification by gas payer!!!  
+        @dev This returns the signature compoenets (v,r,s)
+     */ 
     function getSigComponent(uint256 privateKey,address account,uint256 amount) public view returns(uint8 v, bytes32 r, bytes32 s){
         bytes32 digest = merkleAirdrop.getMessageHash(account, amount);
         (v,r,s) = vm.sign(privateKey, digest);
@@ -47,12 +56,12 @@ contract MerkleAirdropTest is Test,ZkSyncChainChecker{
         console.log(userInitialBalance);
 
         // get the signature
-        vm.startPrank(user);
         (uint8 v, bytes32 r, bytes32 s) = getSigComponent(userPrivateKey, user, AMOUNT);
-        vm.stopPrank();
 
-        vm.prank(gasPayer);
+        // gasPayer claims the airdrop for the user
+        vm.startPrank(gasPayer);
         merkleAirdrop.claim(user, AMOUNT,MERKLE_PROOF,v,r,s);
+        vm.stopPrank();
 
         uint256 userEndingBalance = token.balanceOf(user);
         console.log(userEndingBalance);

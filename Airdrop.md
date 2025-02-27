@@ -10,6 +10,8 @@
 
 ### Merkle Tress
 
+**Note: We can use merkle trees and proofs to efficiently store the `1000+ addresses on-chain` to verify and use for any verification tasks.**
+
 - It is a data structure similar to binary tree
 - It acts as a summary of all the transactions in a block, `enabling fast and secure verification` of data across larger datasets.
 - We can use merkle tree to store data in hash form to `optimize the searching and security of our application`
@@ -67,14 +69,27 @@
 
 
 
-### Signatures and Verification
+
+
+### Signature Standards
+
+
+### ECDSA ALGORITHM
+
+
+### TRANSACTION TYPES
+
+
+### IMPLEMENT SIGNATURES ON-CHAIN
 
 
 
 
 
 
-### Souces
+
+
+### Sources
 
 1. **Merkle trees and Proofs**:
     - https://medium.com/@swastika0015/merkle-proofs-explained-208a72971a50
@@ -85,3 +100,6 @@
 3. **ECDSA signature algorithm**:
     - https://www.cyfrin.io/blog/elliptic-curve-digital-signature-algorithm-and-signatures
     - https://fitsaleem.medium.com/ethereums-elliptic-curve-digital-signature-algorithm-ecdsa-88e1659f4879
+
+4. **Openzepplein create merkle tree js library**:
+   - https://github.com/OpenZeppelin/merkle-tree 

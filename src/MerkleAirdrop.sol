@@ -3,20 +3,26 @@ pragma solidity ^0.8.24;
 
 import {Token} from "src/Token.sol";
 import {IERC20, SafeERC20} from "lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
+import {console} from "lib/forge-std/src/console.sol";
 import {MerkleProof} from "lib/openzeppelin-contracts/contracts/utils/cryptography/MerkleProof.sol";
+import {Merkle} from "lib/murky/src/Merkle.sol";
 import {EIP712} from "lib/openzeppelin-contracts/contracts/utils/cryptography/EIP712.sol";
 import {ECDSA} from "lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
+import {ScriptHelper} from "lib/murky/script/common/ScriptHelper.sol";
 
 /**
     @title MerkleAirdrop contract
     @author anurag shingare
+
+    @notice Try to implement BitMaps instead of hashmaps to optimize the gas cost
     
     @notice To generate merkle trees,proofs and root:
         a. Run GenerateInput.s.sol -> to generate the input file for accounts and amount
         b. Then run MakeMerkle.s.sol -> to generate leaf node hashes, root hash and sibling node hash!!!
  */
 
-contract MerkleAirdrop is EIP712 {
+contract MerkleAirdrop is EIP712,ScriptHelper {
+    using ECDSA for bytes32;
     using SafeERC20 for IERC20;
 
     // ERRORS
@@ -49,11 +55,16 @@ contract MerkleAirdrop is EIP712 {
     }
 
 
-
+    /**
+        @notice claim function
+        
+        @notice This function will verify whether the account is present in merkle tree or not
+        @notice Using merkle-proof and merkle-root function will verify whether account is present in tree or not 
+     */
     function claim(
         address account,
         uint256 amount,
-        bytes32[] calldata merkleProof,
+        bytes32[] memory merkleProof,
         uint8 _v,
 	    bytes32 _r,
 	    bytes32 _s
@@ -68,11 +79,10 @@ contract MerkleAirdrop is EIP712 {
         }
 
         // hash of account and amount -> leaf node
-        // Here, we are hashing twice to avoid hash collision
+        // Here, we are hashing twice to avoid hash collision and prevents replay attacks!!!
         // Here we will check for the data presence in our tree!!!
-        bytes32 leaf = keccak256(
-            bytes.concat(keccak256(abi.encode(account, amount)))
-        );
+        bytes32 leaf = keccak256(bytes.concat(keccak256(ltrim64(abi.encode(account,amount)))));
+        // bytes32 leaf = 0xd1445c931158119b00449ffcac3c947d028c0c359c34a6646d95962b3b55c6ad;
         if (!MerkleProof.verify(merkleProof, i_merkleRoot, leaf)) {
             // 1.
             revert MerkleAirdrop_InvalidProof();
@@ -86,7 +96,42 @@ contract MerkleAirdrop is EIP712 {
     }
 
 
+    function claimWithoutSig(
+        address account,
+        uint256 amount,
+        bytes32[] memory merkleProof
+    ) external {
+        // check whether user already claimed airdrop
+        if (s_isClaimed[account]) {
+            revert MerkleAirdrop_AlreadyClaimed();
+        }
+
+        // verify the presence of account in merkle tree
+        _verifyProof(account,amount,merkleProof,i_merkleRoot);
+
+        // mark true for user claim airdrop
+        s_isClaimed[account] = true;
+
+        // emit event
+        emit MerkleAirdrop_Claimed(account, amount);
+
+        // transfer tokens to user
+        i_token.safeTransfer(account, amount);
+    }
+
+
     // INTERNAL FUNCTIONS
+    function _verifyProof(
+        address account,
+        uint256 amount,
+        bytes32[] memory _merkleProof,
+        bytes32 _merkleRoot
+    ) internal {
+        bytes32 leaf = keccak256(bytes.concat(keccak256(ltrim64(abi.encode(account,amount)))));
+        require(MerkleProof.verify(_merkleProof, _merkleRoot, leaf),"Invalid Proof!!!");
+    }
+
+
     function _isValidSignature(address signer,bytes32 digest,bytes32 r,bytes32 s, uint8 v) internal pure returns(bool){
         (address actualSigner, ,) = ECDSA.tryRecover(digest, v,r,s);
         return (actualSigner == signer);
