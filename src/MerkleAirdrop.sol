@@ -139,7 +139,7 @@ contract MerkleAirdrop is EIP712,ScriptHelper {
 
     // EIP-712 format :-
     // 0x19 0x01 <hashStruct(domain separator)> <hashStruct(message)>
-    // can be recall as hash struct of domain separator
+    // can be recall as domain separator
     function getMessageHash(address account,uint256 amount) public pure returns(bytes32) {
         return (
             keccak256(
@@ -150,7 +150,7 @@ contract MerkleAirdrop is EIP712,ScriptHelper {
             )
         );
     }
-
+    
 
 
     // GETTER FUNCTIONS
