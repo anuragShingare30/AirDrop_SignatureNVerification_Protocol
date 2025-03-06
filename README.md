@@ -1,3 +1,42 @@
+## Coverage report of contract!!!
+
+| File                                  | % Lines         | % Statements    | % Branches    | % Funcs       |
+|---------------------------------------|----------------|----------------|---------------|---------------|
+| script/Deploy.s.sol                   | 80.00% (8/10)  | 81.82% (9/11)  | 100.00% (0/0) | 50.00% (1/2)  |
+| src/MerkleAirdrop.sol                 | 67.65% (23/34) | 74.07% (20/27) | 0.00% (0/5)   | 75.00% (6/8)  |
+| src/Token.sol                         | 100.00% (2/2)  | 100.00% (1/1)  | 100.00% (0/0) | 100.00% (1/1) |
+| **Total**                             | **30.28% (33/109)** | **25.64% (30/117)** | **0.00% (0/10)** | **42.11% (8/19)** |
+
+
+
+## Summary of Complete protocol/application
+
+
+
+1. **User Signs the Claim:**
+   - Users signs claim message using *private-key* 
+   - `v, r, s` components are generated using ECDSA
+   - *Signature Security*
+
+2. **Gas Payer Submits the Claim**:
+   - The gas payer (third party) submits the airdrop claim `on behalf of the user.` 
+   - *Gasless Claims*
+
+3. **Smart Contract Verifies the Claim**:
+   - Contract uses `tryRecover()` function to recover the signer’s address from the signature.
+   - *Contract verifies with actual signer's address*
+   - *On-Chain Verification*
+
+4. **Merkle Proof Validation**:
+   - Here, implemented merkle tree and merkle proofs to `validate whether user is eligible for claim `
+   -  *Efficient Validation*
+
+5. **Airdrop is Processed**:
+   - If all claim is passed, contract then `transfers the claim-amount` to user!!! 
+
+
+
+
 ## Merkle Trees and Merkle Proofs
 
 - They provide a reliable method for verifying the presence of data within a larger dataset
@@ -206,6 +245,7 @@
 
 
 
+
 3. **EIP712: Making Signatures Readable**:
     - If data gets complicated, we will use EIP-712!!!    
     - EIP-712 introduced standardized data: typed structured data hashing and signing.
@@ -261,6 +301,8 @@
         - Gasless transactions
         - Permit function (EIP-2612) → Allows users to sign approvals without sending transactions.
         - Secure off-chain authentication (Sign-In With Ethereum).
+
+
 
 
 4. **Replay Attacks**:
@@ -394,8 +436,31 @@ function _isValidSignature(address signer,bytes32 digest,bytes32 r,bytes32 s, ui
     (address actualSigner, ,) = ECDSA.tryRecover(digest, v,r,s);
     return (actualSigner == signer);
 }
-```
 
+
+// Simple test to verify the signature
+function getSigComponent(uint256 privateKey,address account,uint256 amount) public view returns(uint8 v, bytes32 r, bytes32 s){
+    bytes32 digest = merkleAirdrop.getMessageHash(account, amount);
+    (v,r,s) = vm.sign(privateKey, digest);
+}
+function test_CheckUserCanClaim() public {
+    uint256 userInitialBalance = token.balanceOf(user);
+    console.log("userInitialBalance : ",userInitialBalance);
+
+    // get the signature
+    (v, r, s) = getSigComponent(userPrivateKey, user, AMOUNT);
+
+    // gasPayer claims the airdrop for the user
+    vm.startPrank(gasPayer);
+    merkleAirdrop.claim(user, AMOUNT,MERKLE_PROOF,v,r,s);
+    
+    // merkleAirdrop.claimWithoutSig(user, AMOUNT, MERKLE_PROOF);
+    vm.stopPrank();
+    uint256 userEndingBalance = token.balanceOf(user);
+    console.log("userEndingBalance : ",userEndingBalance);
+    assert(userEndingBalance == AMOUNT + userInitialBalance);
+}
+```
 
 
 

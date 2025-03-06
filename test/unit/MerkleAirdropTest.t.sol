@@ -35,6 +35,7 @@ contract MerkleAirdropTest is Test,ZkSyncChainChecker{
         }
 
         (user,userPrivateKey) = makeAddrAndKey("user");
+        user = 0x6CA6d1e2D5347Bfab1d91e883F1915560e09129D;
         gasPayer = makeAddr("gasPayer");
     }
 
@@ -53,7 +54,7 @@ contract MerkleAirdropTest is Test,ZkSyncChainChecker{
 
     function test_CheckUserCanClaim() public {
         uint256 userInitialBalance = token.balanceOf(user);
-        console.log(userInitialBalance);
+        console.log("userInitialBalance : ",userInitialBalance);
 
         // get the signature
         (uint8 v, bytes32 r, bytes32 s) = getSigComponent(userPrivateKey, user, AMOUNT);
@@ -61,10 +62,26 @@ contract MerkleAirdropTest is Test,ZkSyncChainChecker{
         // gasPayer claims the airdrop for the user
         vm.startPrank(gasPayer);
         merkleAirdrop.claim(user, AMOUNT,MERKLE_PROOF,v,r,s);
+        // merkleAirdrop.claimWithoutSig(user, AMOUNT, MERKLE_PROOF);
         vm.stopPrank();
 
         uint256 userEndingBalance = token.balanceOf(user);
-        console.log(userEndingBalance);
+        console.log("userEndingBalance : ",userEndingBalance);
+        assert(userEndingBalance == AMOUNT + userInitialBalance);
+    }
+
+    function test_CheckUserClaimWithOutSignature() public{
+        uint256 userInitialBalance = token.balanceOf(user);
+        console.log("userInitialBalance before claiming airdrop : ",userInitialBalance);
+
+
+        // gasPayer claims the airdrop for the user
+        vm.startPrank(gasPayer);
+        merkleAirdrop.claimWithoutSig(user, AMOUNT, MERKLE_PROOF);
+        vm.stopPrank();
+
+        uint256 userEndingBalance = token.balanceOf(user);
+        console.log("userEndingBalance after claiming airdrop : ",userEndingBalance);
         assert(userEndingBalance == AMOUNT + userInitialBalance);
     }
 

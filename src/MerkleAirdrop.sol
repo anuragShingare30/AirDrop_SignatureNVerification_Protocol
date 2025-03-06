@@ -13,7 +13,6 @@ import {ScriptHelper} from "lib/murky/script/common/ScriptHelper.sol";
 /**
     @title MerkleAirdrop contract
     @author anurag shingare
-
     @notice Try to implement BitMaps instead of hashmaps to optimize the gas cost
     
     @notice To generate merkle trees,proofs and root:
@@ -49,9 +48,9 @@ contract MerkleAirdrop is EIP712,ScriptHelper {
     // FUNCTIONS
     constructor(bytes32 merkleRoot, IERC20 token)
         EIP712("MerkleAirdrop","1")
-     {
-        merkleRoot = i_merkleRoot;
-        token = i_token;
+    {
+        i_merkleRoot = merkleRoot;
+        i_token = token;
     }
 
 
@@ -80,9 +79,7 @@ contract MerkleAirdrop is EIP712,ScriptHelper {
 
         // hash of account and amount -> leaf node
         // Here, we are hashing twice to avoid hash collision and prevents replay attacks!!!
-        // Here we will check for the data presence in our tree!!!
-        bytes32 leaf = keccak256(bytes.concat(keccak256(ltrim64(abi.encode(account,amount)))));
-        // bytes32 leaf = 0xd1445c931158119b00449ffcac3c947d028c0c359c34a6646d95962b3b55c6ad;
+        bytes32 leaf = keccak256(bytes.concat(keccak256((abi.encode(account,amount)))));
         if (!MerkleProof.verify(merkleProof, i_merkleRoot, leaf)) {
             // 1.
             revert MerkleAirdrop_InvalidProof();
@@ -116,7 +113,7 @@ contract MerkleAirdrop is EIP712,ScriptHelper {
         emit MerkleAirdrop_Claimed(account, amount);
 
         // transfer tokens to user
-        i_token.safeTransfer(account, amount);
+        IERC20(i_token).safeTransfer(account, amount);
     }
 
 
@@ -127,11 +124,14 @@ contract MerkleAirdrop is EIP712,ScriptHelper {
         bytes32[] memory _merkleProof,
         bytes32 _merkleRoot
     ) internal {
-        bytes32 leaf = keccak256(bytes.concat(keccak256(ltrim64(abi.encode(account,amount)))));
-        require(MerkleProof.verify(_merkleProof, _merkleRoot, leaf),"Invalid Proof!!!");
+        bytes32 leaf = keccak256(bytes.concat(keccak256(abi.encode(account,amount))));
+        if (!MerkleProof.verify(_merkleProof, i_merkleRoot, leaf)) {
+            revert MerkleAirdrop_InvalidProof();
+        }
     }
 
 
+    // tryRecover() -> Returns the address that signed a hashed message with `signature`(v,r,s).
     function _isValidSignature(address signer,bytes32 digest,bytes32 r,bytes32 s, uint8 v) internal pure returns(bool){
         (address actualSigner, ,) = ECDSA.tryRecover(digest, v,r,s);
         return (actualSigner == signer);
