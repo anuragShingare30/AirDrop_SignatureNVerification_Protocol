@@ -9,6 +9,16 @@
 
 
 
+## Concepts implemented in protocol
+
+1. **ERC-20 token**
+2. **Merkle Trees and merkle proofs**
+3. **ECDSA algorithm** to generate signatures
+4. **Signature Standards (EIP-191 and EIP-712)**
+5. **Signature Verification**
+
+
+
 ## Summary of Complete protocol/application
 
 
