@@ -7,6 +7,12 @@ import {Token} from "src/Token.sol";
 import {MerkleAirdrop} from "src/MerkleAirdrop.sol";
 import {IERC20 } from "lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
 
+/**
+ * @title MerkleAirdropTest Testing contract
+ * @author anurag shingare
+ * @notice Testing the claim function by providing root and proofs
+ * @dev claim() function will verify the signatures and merkle proof to verify the account
+ */
 
 contract NewMerkleAirdropTest is Test{
     Token public token;

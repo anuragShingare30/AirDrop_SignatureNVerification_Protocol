@@ -15,9 +15,21 @@ import {ScriptHelper} from "lib/murky/script/common/ScriptHelper.sol";
     @author anurag shingare
     @notice Try to implement BitMaps instead of hashmaps to optimize the gas cost
     
-    @notice To generate merkle trees,proofs and root:
-        a. Run GenerateInput.s.sol -> to generate the input file for accounts and amount
-        b. Then run MakeMerkle.s.sol -> to generate leaf node hashes, root hash and sibling node hash!!!
+    @notice Contract contains claiming() function for user to claim the airdrop
+    @notice The flow of application followed is:
+        a. Protocol will generate the merkle tree and proofs, storing the verified claimers for airdrop
+        b. GenerateInput.s.sol -> This script file will generate the merkle tree containing claimers address
+        c. MakeMerkle.s.sol -> This Script file will generate the merkle proof for the address and amount
+        d. Storing the claimers activity in a map, checking whether they already claimed airdrop or not
+        e. Using ECDSA algorithm to verify the signature provided by the gas payer
+        f. Verifying account is present or not in merkle Tree using verify() function
+        g. Upon verifying update the hashmap and transfer the amount of token to user
+    @dev We are following the below checks and methods:
+        a. Protocol will generate the merkle tree and proofs
+        b. Claim() function will check the hashmap for users activity
+        c. Verify the signature
+        d. Verify the presence of account in merkle tree
+        e. Transferring token to user
  */
 
 contract MerkleAirdrop is EIP712,ScriptHelper {
@@ -56,9 +68,12 @@ contract MerkleAirdrop is EIP712,ScriptHelper {
 
     /**
         @notice claim function
-        
-        @notice This function will verify whether the account is present in merkle tree or not
-        @notice Using merkle-proof and merkle-root function will verify whether account is present in tree or not 
+        @notice function will verify the signatures using ECDSA algorithm
+        @notice Then will verify the account and amount presence in merkle tree
+        @notice After verification contract will transfer the token to user
+
+        @dev Here, claimer will just sign the message off-chain and generates signature
+        @dev Third-party(gas payer) will pay the gas fees for user, so that user can claim the airdrop
      */
     function claim(
         address account,

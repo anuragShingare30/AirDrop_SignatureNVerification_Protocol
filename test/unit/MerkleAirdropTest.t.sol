@@ -9,6 +9,13 @@ import {IERC20 } from "lib/openzeppelin-contracts/contracts/token/ERC20/utils/Sa
 import {ZkSyncChainChecker} from "lib/foundry-devops/src/ZkSyncChainChecker.sol";
 import {DeployTokenAndAirdropContract} from "script/Deploy.s.sol";
 
+/**
+ * @title MerkleAirdropTest Testing contract
+ * @author anurag shingare
+ * @notice Testing the claim function by providing root and proofs
+ * @dev claim() function will verify the signatures and merkle proof to verify the account
+ */
+
 contract MerkleAirdropTest is Test,ZkSyncChainChecker{
     Token public token;
     MerkleAirdrop public merkleAirdrop;

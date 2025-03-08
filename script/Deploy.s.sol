@@ -6,6 +6,13 @@ import {Token} from "src/Token.sol";
 import {MerkleAirdrop} from "src/MerkleAirdrop.sol";
 import {IERC20 } from "lib/openzeppelin-contracts/contracts/interfaces/IERC20.sol";
 
+/**
+ * @title DeployTokenAndAirdropContract deploy script contract
+ * @author anurag shingare
+ * @notice An deploy script to deploy contract on any layer and roll-ups blockchain network
+ * @notice Here, during deploying the contract we need to provide the merkle root 
+ */
+
 contract DeployTokenAndAirdropContract is Script{
 
     bytes32 public merkleRoot = 0x74ddccb6e201771dc8ddcc9759f73a3bb6851b67f57500b2f7fc2323c03344ba;
